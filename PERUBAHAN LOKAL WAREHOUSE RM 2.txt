@@ -1,0 +1,678 @@
+print controller
+=================================================================
+
+public function excelRev()
+    {
+        $data = $this->printModel->Rev();
+        $date = $this->printModel->dateRev();
+        $groupmachine = 'REVISI';
+        $wf = $date[0]['wo_from'];
+        $we = $date[0]['wo_end'];
+        if (!empty($data)  && !empty($date)) {
+
+            $borderstyle = [
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    ],
+                ],
+
+            ];
+
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->mergeCells('A1:G1');
+            $sheet->mergeCells('A2:G2');
+
+            $sheet->getStyle('A1:G2')->getAlignment()->setHorizontal('center');
+            $sheet->getStyle('A1:G2')->getFont()->setBold(true);
+
+            $sheet->setCellValue('A1', 'LOADING RAW MATERIAL ' . $date[0]['wo_from'] . ' - ' . $date[0]['wo_end']);
+            $sheet->setCellValue('A2', $groupmachine);
+            $sheet->setCellValue('E3', 'Supply Date :');
+            $sheet->setCellValue('E4', 'Entry Date :');
+
+            $sheet->setCellValue('A5', 'No.Machine');
+            $sheet->setCellValue('B5', 'Part No Running');
+            $sheet->setCellValue('C5', 'RM Code');
+            $sheet->setCellValue('D5', 'Type');
+            $sheet->setCellValue('E5', 'NEED @DAY (BAR)');
+            $sheet->setCellValue('F5', 'Remark');
+            $sheet->setCellValue('G5', 'Prod. Confirm');
+            $sheet->getStyle('A5:G5')->getAlignment()->setHorizontal('center');
+            $sheet->getStyle('A5:G5')->getFont()->setBold(true);
+
+            $sheet->getColumnDimension('A')->setAutoSize(true);
+            $sheet->getColumnDimension('B')->setAutoSize(true);
+            $sheet->getColumnDimension('C')->setAutoSize(true);
+            $sheet->getColumnDimension('D')->setWidth(220, 'pt');
+            $sheet->getColumnDimension('E')->setAutoSize(true);
+            $sheet->getColumnDimension('F')->setWidth(95, 'px');
+            $sheet->getColumnDimension('G')->setAutoSize(true);
+
+            $column = 6;
+            foreach ($data as $row) {
+                $sheet->setCellValue('A' . $column, $row->kode_sap);
+                $sheet->setCellValue('B' . $column, $row->part_no_running);
+                $sheet->setCellValue('C' . $column, $row->rm_code);
+                $sheet->setCellValue('D' . $column, $row->type);
+                $sheet->setCellValue('E' . $column, $row->need_day_bar);
+                $sheet->setCellValue('F' . $column, ' ');
+                $sheet->setCellValue('G' . $column, ' ');
+
+                $sheet->getStyle('A5:G' . $column)->applyFromArray($borderstyle);
+                // $sheet->getStyle('D' . $column)->getAlignment()->setWrapText(true);
+                $column++;
+                $ttd = $column;
+            }
+
+            $temp = $ttd + 1;
+            $sheet->mergeCells("B$temp:C$temp");
+            $sheet->mergeCells("E$temp:F$temp");
+            $sheet->mergeCells('B' . $temp + 1 . ':C' . $temp + 1);
+            $sheet->mergeCells('E' . $temp + 1 . ':F' . $temp + 1);
+            $sheet->mergeCells('B' . $temp + 2 . ':C' . $temp + 2);
+            $sheet->mergeCells('E' . $temp + 2 . ':F' . $temp + 2);
+
+            $sheet->getRowDimension($temp + 1)->setRowHeight(65, 'pt');
+
+            $sheet->setCellValue('B' . $temp, 'Checked By');
+            $sheet->setCellValue('D' . $temp, 'Checked By');
+            $sheet->setCellValue('E' . $temp, 'Re-Checked By');
+
+            $sheet->setCellValue('B' . $temp + 2, 'Production');
+            $sheet->setCellValue('D' . $temp + 2, 'Bambang');
+            $sheet->setCellValue('E' . $temp + 2, 'Cep Suwandi');
+
+            $sheet->getStyle('B' . $temp . ':F' . $temp + 2)->applyFromArray($borderstyle);
+            $sheet->getStyle('B' . $temp . ':F' . $temp + 2)->getAlignment()->setHorizontal('center');;
+
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'Loading Revisi';
+            $writer->save($fileName);
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename=' . $fileName . '.xlsx');
+            header('Cache-Control: max-age=0');
+            flush();
+            readfile($fileName);
+
+            exit;
+        } else {
+            echo 'Tidak ada Data';
+        }
+    }
+
+    public function excelCnc1()
+    {
+        $data = $this->printModel->Cnc1();
+        $date = $this->printModel->dateCnc1();
+        $groupmachine = 'CNC LINE 1';
+        if (!empty($date) && !empty($data)) {
+            $borderstyle = [
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    ],
+                ],
+
+            ];
+
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->mergeCells('A1:G1');
+            $sheet->mergeCells('A2:G2');
+
+            $sheet->getStyle('A1:G2')->getAlignment()->setHorizontal('center');
+            $sheet->getStyle('A1:G2')->getFont()->setBold(true);
+
+            $sheet->setCellValue('A1', 'LOADING RAW MATERIAL ' . $date[0]['wo_from'] . ' - ' . $date[0]['wo_end']);
+            $sheet->setCellValue('A2', $groupmachine);
+            $sheet->setCellValue('E3', 'Supply Date :');
+            $sheet->setCellValue('E4', 'Entry Date :');
+
+            $sheet->setCellValue('A5', 'No.Machine');
+            $sheet->setCellValue('B5', 'Part No Running');
+            $sheet->setCellValue('C5', 'RM Code');
+            $sheet->setCellValue('D5', 'Type');
+            $sheet->setCellValue('E5', 'NEED @DAY (BAR)');
+            $sheet->setCellValue('F5', 'Remark');
+            $sheet->setCellValue('G5', 'Prod. Confirm');
+            $sheet->getStyle('A5:G5')->getAlignment()->setHorizontal('center');
+            $sheet->getStyle('A5:G5')->getFont()->setBold(true);
+
+            $sheet->getColumnDimension('A')->setAutoSize(true);
+            $sheet->getColumnDimension('B')->setAutoSize(true);
+            $sheet->getColumnDimension('C')->setAutoSize(true);
+            $sheet->getColumnDimension('D')->setWidth(220, 'pt');
+            $sheet->getColumnDimension('E')->setAutoSize(true);
+            $sheet->getColumnDimension('F')->setWidth(95, 'px');
+            $sheet->getColumnDimension('G')->setAutoSize(true);
+
+            $column = 6;
+            foreach ($data as $row) {
+                $sheet->setCellValue('A' . $column, $row->kode_sap);
+                $sheet->setCellValue('B' . $column, $row->part_no_running);
+                $sheet->setCellValue('C' . $column, $row->rm_code);
+                $sheet->setCellValue('D' . $column, $row->type);
+                $sheet->setCellValue('E' . $column, $row->need_day_bar);
+                $sheet->setCellValue('F' . $column, ' ');
+                $sheet->setCellValue('G' . $column, ' ');
+
+                $sheet->getStyle('A5:G' . $column)->applyFromArray($borderstyle);
+                // $sheet->getStyle('D' . $column)->getAlignment()->setWrapText(true);
+                $column++;
+                $ttd = $column;
+            }
+
+            $temp = $ttd + 1;
+            $sheet->mergeCells("B$temp:C$temp");
+            $sheet->mergeCells("E$temp:F$temp");
+            $sheet->mergeCells('B' . $temp + 1 . ':C' . $temp + 1);
+            $sheet->mergeCells('E' . $temp + 1 . ':F' . $temp + 1);
+            $sheet->mergeCells('B' . $temp + 2 . ':C' . $temp + 2);
+            $sheet->mergeCells('E' . $temp + 2 . ':F' . $temp + 2);
+
+            $sheet->getRowDimension($temp + 1)->setRowHeight(65, 'pt');
+
+            $sheet->setCellValue('B' . $temp, 'Checked By');
+            $sheet->setCellValue('D' . $temp, 'Checked By');
+            $sheet->setCellValue('E' . $temp, 'Re-Checked By');
+
+            $sheet->setCellValue('B' . $temp + 2, 'Production');
+            $sheet->setCellValue('D' . $temp + 2, 'Bambang');
+            $sheet->setCellValue('E' . $temp + 2, 'Cep Suwandi');
+
+            $sheet->getStyle('B' . $temp . ':F' . $temp + 2)->applyFromArray($borderstyle);
+            $sheet->getStyle('B' . $temp . ':F' . $temp + 2)->getAlignment()->setHorizontal('center');
+
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'Loading Cnc Line 1';
+            $writer->save($fileName);
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename=' . $fileName . '.xlsx');
+            header('Cache-Control: max-age=0');
+            flush();
+            readfile($fileName);
+            exit;
+        } else {
+            echo "Tidak Ada Data";
+        }
+    }
+
+    public function excelCnc2()
+    {
+        $data = $this->printModel->Cnc2();
+        $date = $this->printModel->dateCnc2();
+        $groupmachine = 'CNC LINE 2';
+        if (!empty($date) && !empty($data)) {
+            $borderstyle = [
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    ],
+                ],
+
+            ];
+
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->mergeCells('A1:G1');
+            $sheet->mergeCells('A2:G2');
+
+            $sheet->getStyle('A1:G2')->getAlignment()->setHorizontal('center');
+            $sheet->getStyle('A1:G2')->getFont()->setBold(true);
+
+            $sheet->setCellValue('A1', 'LOADING RAW MATERIAL ' . $date[0]['wo_from'] . ' - ' . $date[0]['wo_end']);
+            $sheet->setCellValue('A2', $groupmachine);
+            $sheet->setCellValue('E3', 'Supply Date :');
+            $sheet->setCellValue('E4', 'Entry Date :');
+
+            $sheet->setCellValue('A5', 'No.Machine');
+            $sheet->setCellValue('B5', 'Part No Running');
+            $sheet->setCellValue('C5', 'RM Code');
+            $sheet->setCellValue('D5', 'Type');
+            $sheet->setCellValue('E5', 'NEED @DAY (BAR)');
+            $sheet->setCellValue('F5', 'Remark');
+            $sheet->setCellValue('G5', 'Prod. Confirm');
+            $sheet->getStyle('A5:G5')->getAlignment()->setHorizontal('center');
+            $sheet->getStyle('A5:G5')->getFont()->setBold(true);
+
+            $sheet->getColumnDimension('A')->setAutoSize(true);
+            $sheet->getColumnDimension('B')->setAutoSize(true);
+            $sheet->getColumnDimension('C')->setAutoSize(true);
+            $sheet->getColumnDimension('D')->setWidth(220, 'pt');
+            $sheet->getColumnDimension('E')->setAutoSize(true);
+            $sheet->getColumnDimension('F')->setWidth(95, 'px');
+            $sheet->getColumnDimension('G')->setAutoSize(true);
+
+            $column = 6;
+            foreach ($data as $row) {
+                $sheet->setCellValue('A' . $column, $row->kode_sap);
+                $sheet->setCellValue('B' . $column, $row->part_no_running);
+                $sheet->setCellValue('C' . $column, $row->rm_code);
+                $sheet->setCellValue('D' . $column, $row->type);
+                $sheet->setCellValue('E' . $column, $row->need_day_bar);
+                $sheet->setCellValue('F' . $column, ' ');
+                $sheet->setCellValue('G' . $column, ' ');
+
+                $sheet->getStyle('A5:G' . $column)->applyFromArray($borderstyle);
+                // $sheet->getStyle('D' . $column)->getAlignment()->setWrapText(true);
+                $column++;
+                $ttd = $column;
+            }
+
+            $temp = $ttd + 1;
+            $sheet->mergeCells("B$temp:C$temp");
+            $sheet->mergeCells("E$temp:F$temp");
+            $sheet->mergeCells('B' . $temp + 1 . ':C' . $temp + 1);
+            $sheet->mergeCells('E' . $temp + 1 . ':F' . $temp + 1);
+            $sheet->mergeCells('B' . $temp + 2 . ':C' . $temp + 2);
+            $sheet->mergeCells('E' . $temp + 2 . ':F' . $temp + 2);
+
+            $sheet->getRowDimension($temp + 1)->setRowHeight(65, 'pt');
+
+            $sheet->setCellValue('B' . $temp, 'Checked By');
+            $sheet->setCellValue('D' . $temp, 'Checked By');
+            $sheet->setCellValue('E' . $temp, 'Re-Checked By');
+
+            $sheet->setCellValue('B' . $temp + 2, 'Production');
+            $sheet->setCellValue('D' . $temp + 2, 'Bambang');
+            $sheet->setCellValue('E' . $temp + 2, 'Cep Suwandi');
+
+            $sheet->getStyle('B' . $temp . ':F' . $temp + 2)->applyFromArray($borderstyle);
+            $sheet->getStyle('B' . $temp . ':F' . $temp + 2)->getAlignment()->setHorizontal('center');
+
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'Loading Cnc Line 2';
+            $writer->save($fileName);
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename=' . $fileName . '.xlsx');
+            header('Cache-Control: max-age=0');
+            flush();
+            readfile($fileName);
+            exit;
+        } else {
+            echo 'Tidak ada Data';
+        }
+    }
+
+    public function excelCnc3()
+    {
+        $data = $this->printModel->Cnc3();
+        $date = $this->printModel->dateCnc3();
+        $groupmachine = 'CNC LINE 3';
+        if (!empty($date) && !empty($data)) {
+            $borderstyle = [
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    ],
+                ],
+
+            ];
+
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->mergeCells('A1:G1');
+            $sheet->mergeCells('A2:G2');
+
+            $sheet->getStyle('A1:G2')->getAlignment()->setHorizontal('center');
+            $sheet->getStyle('A1:G2')->getFont()->setBold(true);
+
+            $sheet->setCellValue('A1', 'LOADING RAW MATERIAL ' . $date[0]['wo_from'] . ' - ' . $date[0]['wo_end']);
+            $sheet->setCellValue('A2', $groupmachine);
+            $sheet->setCellValue('E3', 'Supply Date :');
+            $sheet->setCellValue('E4', 'Entry Date :');
+
+            $sheet->setCellValue('A5', 'No.Machine');
+            $sheet->setCellValue('B5', 'Part No Running');
+            $sheet->setCellValue('C5', 'RM Code');
+            $sheet->setCellValue('D5', 'Type');
+            $sheet->setCellValue('E5', 'NEED @DAY (BAR)');
+            $sheet->setCellValue('F5', 'Remark');
+            $sheet->setCellValue('G5', 'Prod. Confirm');
+            $sheet->getStyle('A5:G5')->getAlignment()->setHorizontal('center');
+            $sheet->getStyle('A5:G5')->getFont()->setBold(true);
+
+            $sheet->getColumnDimension('A')->setAutoSize(true);
+            $sheet->getColumnDimension('B')->setAutoSize(true);
+            $sheet->getColumnDimension('C')->setAutoSize(true);
+            $sheet->getColumnDimension('D')->setWidth(220, 'pt');
+            $sheet->getColumnDimension('E')->setAutoSize(true);
+            $sheet->getColumnDimension('F')->setWidth(95, 'px');
+            $sheet->getColumnDimension('G')->setAutoSize(true);
+
+            $column = 6;
+            foreach ($data as $row) {
+                $sheet->setCellValue('A' . $column, $row->kode_sap);
+                $sheet->setCellValue('B' . $column, $row->part_no_running);
+                $sheet->setCellValue('C' . $column, $row->rm_code);
+                $sheet->setCellValue('D' . $column, $row->type);
+                $sheet->setCellValue('E' . $column, $row->need_day_bar);
+                $sheet->setCellValue('F' . $column, ' ');
+                $sheet->setCellValue('G' . $column, ' ');
+
+                $sheet->getStyle('A5:G' . $column)->applyFromArray($borderstyle);
+                // $sheet->getStyle('D' . $column)->getAlignment()->setWrapText(true);
+                $column++;
+                $ttd = $column;
+            }
+
+            $temp = $ttd + 1;
+            $sheet->mergeCells("B$temp:C$temp");
+            $sheet->mergeCells("E$temp:F$temp");
+            $sheet->mergeCells('B' . $temp + 1 . ':C' . $temp + 1);
+            $sheet->mergeCells('E' . $temp + 1 . ':F' . $temp + 1);
+            $sheet->mergeCells('B' . $temp + 2 . ':C' . $temp + 2);
+            $sheet->mergeCells('E' . $temp + 2 . ':F' . $temp + 2);
+
+            $sheet->getRowDimension($temp + 1)->setRowHeight(65, 'pt');
+
+            $sheet->setCellValue('B' . $temp, 'Checked By');
+            $sheet->setCellValue('D' . $temp, 'Checked By');
+            $sheet->setCellValue('E' . $temp, 'Re-Checked By');
+
+            $sheet->setCellValue('B' . $temp + 2, 'Production');
+            $sheet->setCellValue('D' . $temp + 2, 'Bambang');
+            $sheet->setCellValue('E' . $temp + 2, 'Cep Suwandi');
+
+            $sheet->getStyle('B' . $temp . ':F' . $temp + 2)->applyFromArray($borderstyle);
+            $sheet->getStyle('B' . $temp . ':F' . $temp + 2)->getAlignment()->setHorizontal('center');
+
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'Loading Cnc Line 3';
+            $writer->save($fileName);
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename=' . $fileName . '.xlsx');
+            header('Cache-Control: max-age=0');
+            flush();
+            readfile($fileName);
+            exit;
+        } else {
+            echo 'Tidak ada Data';
+        }
+    }
+
+    public function excelCam()
+    {
+        $data = $this->printModel->Cam();
+        $date = $this->printModel->dateCam();
+        $groupmachine = 'CAM';
+        if (!empty($date) && !empty($data)) {
+            $borderstyle = [
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    ],
+                ],
+
+            ];
+
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->mergeCells('A1:G1');
+            $sheet->mergeCells('A2:G2');
+
+            $sheet->getStyle('A1:G2')->getAlignment()->setHorizontal('center');
+            $sheet->getStyle('A1:G2')->getFont()->setBold(true);
+
+            $sheet->setCellValue('A1', 'LOADING RAW MATERIAL ' . $date[0]['wo_from'] . ' - ' . $date[0]['wo_end']);
+            $sheet->setCellValue('A2', $groupmachine);
+            $sheet->setCellValue('E3', 'Supply Date :');
+            $sheet->setCellValue('E4', 'Entry Date :');
+
+            $sheet->setCellValue('A5', 'No.Machine');
+            $sheet->setCellValue('B5', 'Part No Running');
+            $sheet->setCellValue('C5', 'RM Code');
+            $sheet->setCellValue('D5', 'Type');
+            $sheet->setCellValue('E5', 'NEED @DAY (BAR)');
+            $sheet->setCellValue('F5', 'Remark');
+            $sheet->setCellValue('G5', 'Prod. Confirm');
+            $sheet->getStyle('A5:G5')->getAlignment()->setHorizontal('center');
+            $sheet->getStyle('A5:G5')->getFont()->setBold(true);
+
+            $sheet->getColumnDimension('A')->setAutoSize(true);
+            $sheet->getColumnDimension('B')->setAutoSize(true);
+            $sheet->getColumnDimension('C')->setAutoSize(true);
+            $sheet->getColumnDimension('D')->setWidth(220, 'pt');
+            $sheet->getColumnDimension('E')->setAutoSize(true);
+            $sheet->getColumnDimension('F')->setWidth(95, 'px');
+            $sheet->getColumnDimension('G')->setAutoSize(true);
+
+            $column = 6;
+            foreach ($data as $row) {
+                $sheet->setCellValue('A' . $column, $row->kode_sap);
+                $sheet->setCellValue('B' . $column, $row->part_no_running);
+                $sheet->setCellValue('C' . $column, $row->rm_code);
+                $sheet->setCellValue('D' . $column, $row->type);
+                $sheet->setCellValue('E' . $column, $row->need_day_bar);
+                $sheet->setCellValue('F' . $column, ' ');
+                $sheet->setCellValue('G' . $column, ' ');
+
+                $sheet->getStyle('A5:G' . $column)->applyFromArray($borderstyle);
+                // $sheet->getStyle('D' . $column)->getAlignment()->setWrapText(true);
+                $column++;
+                $ttd = $column;
+            }
+
+            $temp = $ttd + 1;
+            $sheet->mergeCells("B$temp:C$temp");
+            $sheet->mergeCells("E$temp:F$temp");
+            $sheet->mergeCells('B' . $temp + 1 . ':C' . $temp + 1);
+            $sheet->mergeCells('E' . $temp + 1 . ':F' . $temp + 1);
+            $sheet->mergeCells('B' . $temp + 2 . ':C' . $temp + 2);
+            $sheet->mergeCells('E' . $temp + 2 . ':F' . $temp + 2);
+
+            $sheet->getRowDimension($temp + 1)->setRowHeight(65, 'pt');
+
+            $sheet->setCellValue('B' . $temp, 'Checked By');
+            $sheet->setCellValue('D' . $temp, 'Checked By');
+            $sheet->setCellValue('E' . $temp, 'Re-Checked By');
+
+            $sheet->setCellValue('B' . $temp + 2, 'Production');
+            $sheet->setCellValue('D' . $temp + 2, 'Bambang');
+            $sheet->setCellValue('E' . $temp + 2, 'Cep Suwandi');
+
+            $sheet->getStyle('B' . $temp . ':F' . $temp + 2)->applyFromArray($borderstyle);
+            $sheet->getStyle('B' . $temp . ':F' . $temp + 2)->getAlignment()->setHorizontal('center');
+
+            $writer = new Xlsx($spreadsheet);
+            $fileName = 'Loading Cam';
+            $writer->save($fileName);
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename=' . $fileName . '.xlsx');
+            header('Cache-Control: max-age=0');
+            flush();
+            readfile($fileName);
+            exit;
+        } else {
+            echo 'Tidak ada Data';
+        }
+    }
+
+print approval
+===============================================================
+
+<body>
+    <?php if (!empty($tanggal)) { ?>
+        <h5 style="text-align: center;">LOADING RAW MATERIAL <?= $tanggal[0]['wo_from'] ?> - <?= $tanggal[0]['wo_end'] ?> <br>
+            <?= $tittle ?>
+        </h5>
+        <div class="suplay">
+            Supply Date : <br>
+            Entry Date :
+        </div>
+        <table class="layout" border="1" cellspacing="0">
+            <thead>
+                <tr>
+                    <th style="border:1px; width: 50px; word-wrap:break-word; display:inline-block;">No Machine</th>
+                    <th>Part No.Running</th>
+                    <th>RM Code</th>
+                    <th>Type</th>
+                    <th style="border:1px; width: 70px; word-wrap:break-word; display:inline-block;">NEED @DAY (BAR)</th>
+                    <th style="width: 70px;">Remark</th>
+                    <th>Prod. Confirm</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if (!empty($print)) {
+                    foreach ($print as $dt) {
+                ?>
+                        <tr>
+                            <td><?= $dt->kode_sap; ?></td>
+                            <td><?= $dt->part_no_running; ?></td>
+                            <td><?= $dt->rm_code; ?></td>
+                            <td><?= $dt->type; ?></td>
+                            <td style="text-align:right;"><?= $dt->need_day_bar; ?></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    <?php
+                    }
+                } else {
+                    ?>
+                    <tr>
+                        <td colspan="9">Tidak ada data</td>
+                    </tr>
+                <?php
+                }
+                ?>
+            </tbody>
+        </table>
+        <br>
+        <table class="ttd" border="1" cellspacing="0">
+            <tbody>
+                <tr>
+                    <td>Checked By</td>
+                    <td>Checked By</td>
+                    <td>Re-Checked By</td>
+                </tr>
+                <tr>
+                    <td style="height:70px;"></td>
+                    <td style="height:70px;"></td>
+                    <td style="height:70px;"></td>
+                </tr>
+                <tr>
+                    <td>Production</td>
+                    <td>Bambang</td>
+                    <td>Cep Suwandi</td>
+                </tr>
+            </tbody>
+        </table>
+    <?php
+    } else { ?>
+        <p>Tidak Ada Data</p>
+    <?php
+    }
+    ?>
+</body>
+
+data_show
+==================================================================
+
+<div class="container-fluid mt-3 mr-3" style="max-width:100%;font-size:15px;">
+    <div class="card">
+        <div class="card-body">
+            <h1><?= $tittle; ?></h1>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col">
+                        <div class="dropdown" style="display: inline-block;">
+                            <a class="btn btn-light dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">Group Machine</a>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <li><a class="dropdown-item" href="Rev">REVISI</a></li>
+                                <li><a class="dropdown-item" href="Cnc1">Cnc Line 1</a></li>
+                                <li><a class="dropdown-item" href="Cnc2">Cnc Line 2</a></li>
+                                <li><a class="dropdown-item" href="Cnc3">Cnc Line 3</a></li>
+                                <li><a class="dropdown-item" href="Cam">CAM</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col" style="text-align: right;">
+                        <!-- <a href="/aisoft/public/printController/" target="_blank" class="btn btn-primary">Print Approval</a> -->
+                        <a onclick="function1(), powww()" class="btn btn-primary">Print Approval</a>
+                        |
+                        <a href="/aisoft/public/printController/<?= $tag; ?>" target="_blank" class="btn btn-primary">Print Tag</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row-12 mt-2">
+        <?php
+        if (session()->getFlashdata('message')) {
+        ?>
+            <div class="alert alert-info">
+                <?= session()->getFlashdata('message') ?>
+            </div>
+        <?php
+        }
+        ?>
+    </div>
+
+    <div class="card mt-2 mb-3">
+        <div class="card-body">
+
+            <table id="table_id" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Kode SAP</th>
+                        <th>Part No.Running</th>
+                        <th>RM Code</th>
+                        <th>Type</th>
+                        <th>Need Day Bar</th>
+                        <th>DI</th>
+                        <th>WO FROM</th>
+                        <th>WO END</th>
+                        <th>Group Machine</th>
+                    </tr>
+                </thead>
+                <tbody id="contactTable">
+                    <?php
+                    if (!empty($Rm)) {
+                        foreach ($Rm as $dt) {
+                    ?>
+                            <tr>
+                                <td><?= $dt->kode_sap; ?></td>
+                                <td><?= $dt->part_no_running; ?></td>
+                                <td><?= $dt->rm_code; ?></td>
+                                <td><?= $dt->type; ?></td>
+                                <td><?= $dt->need_day_bar; ?></td>
+                                <td><?= $dt->day_in; ?></td>
+                                <td><?= $dt->wo_from; ?></td>
+                                <td><?= $dt->wo_end; ?></td>
+                                <td><?= $dt->group_machine; ?></td>
+                            </tr>
+                        <?php
+                        }
+                    } else {
+                        ?>
+                        <tr>
+                            <td colspan="9">Tidak ada data</td>
+                        </tr>
+                    <?php
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function function1() {
+        open("/aisoft/public/printController/<?= $export; ?>");
+        setTimeout(function powww() {
+            window.open("/aisoft/public/printController/<?= $approve; ?>");
+        }, 500);
+    }
+</script>
+
+</body>
